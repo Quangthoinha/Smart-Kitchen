@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+
+        <!-- ===== HÌNH ẢNH MÓN ĂN ===== -->
+        <div class="mb-8">
+            <img src="{{ url_for('static', filename='recipe_pics/' + recipe.image_file) }}" alt="Hình ảnh món {{ recipe.name }}" class="w-full h-80 md:h-96 object-cover rounded-xl shadow-md">
+        </div>
+
+        <!-- ===== THÔNG TIN CHUNG ===== -->
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ recipe.name }}</h1>
+            
+            <!-- Metadata với icons -->
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-3 text-gray-600 border-b border-gray-200 pb-6">
+                <span class="flex items-center">
+                    <i class="ri-user-smile-line mr-2 text-primary"></i>
+                    Tác giả: <strong class="ml-1 text-gray-800">{{ recipe.author.username }}</strong>
+                </span>
+                <span class="flex items-center">
+                    <i class="ri-time-line mr-2 text-primary"></i>
+                    {{ recipe.cooking_time }} phút
+                </span>
+                <span class="flex items-center">
+                    <i class="ri-service-line mr-2 text-primary"></i>
+                    Độ khó: {{ recipe.difficulty.value }}
+                </span>
+                <span class="flex items-center">
+                    <i class="ri-global-line mr-2 text-primary"></i>
+                    Ẩm thực: {{ recipe.cuisine.value }}
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== NỘI DUNG CHÍNH (2 CỘT) ===== -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mt-6">
+
+            <!-- CỘT NGUYÊN LIỆU (Bên trái) -->
+            <div class="lg:col-span-1 bg-primary/5 p-6 rounded-lg border border-primary/20">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="ri-shopping-basket-2-line mr-3 text-primary"></i>
+                    Nguyên liệu
+                </h2>
+                <!-- 
+                    Sử dụng class 'whitespace-pre-line' của TailwindCSS
+                    để tự động nhận diện và hiển thị các dấu xuống dòng (\n)
+                    từ database mà không cần filter 'nl2br'.
+                -->
+                <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {{ recipe.ingredients }}
+                </div>
+            </div>
+
+            <!-- CỘT HƯỚNG DẪN (Bên phải) -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="ri-tools-line mr-3 text-primary"></i>
+                    Hướng dẫn thực hiện
+                </h2>
+                <!--
+                    Sử dụng 'prose' để tự động định dạng văn bản (ví dụ: các đoạn văn)
+                    và 'whitespace-pre-line' để giữ nguyên các lần xuống dòng.
+                -->
+                <div class="prose prose-lg max-w-none text-gray-800 leading-loose whitespace-pre-line">
+                    {{ recipe.instructions }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== NÚT QUAY LẠI ===== -->
+        <div class="mt-12 border-t pt-8 text-center flex items-center justify-center space-x-4">
+    <a href="{{ url_for('home') }}" class="inline-block bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+        <i class="ri-arrow-left-line mr-2"></i>
+        Quay lại Trang chủ
+    </a>
+
+    <!-- Nút Lưu/Bỏ lưu vào bộ sưu tập -->
+    {% if current_user.is_authenticated %}
+        {% if current_user.is_saving(recipe) %}
+            <!-- Nếu đã lưu -> Hiển thị nút Bỏ lưu -->
+            <form action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}" method="POST">
+                <button type="submit" class="inline-block bg-red-100 text-red-700 px-6 py-3 rounded-lg font-medium hover:bg-red-200 transition-colors">
+                    <i class="ri-delete-bin-6-line mr-2"></i>
+                    Xóa khỏi bộ sưu tập
+                </button>
+            </form>
+        {% else %}
+            <!-- Nếu chưa lưu -> Hiển thị nút Lưu -->
+            <form action="{{ url_for('save_recipe', recipe_id=recipe.id) }}" method="POST">
+                 <button type="submit" class="inline-block bg-primary/20 text-primary px-6 py-3 rounded-lg font-medium hover:bg-primary/30 transition-colors">
+                    <i class="ri-bookmark-line mr-2"></i>
+                    Lưu vào bộ sưu tập
+                </button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+
+
+    </div>
+</div>
+{% endblock %}

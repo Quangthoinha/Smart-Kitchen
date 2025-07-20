@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tủ lạnh của tôi - Bếp Thông Minh</title>
+    
+    <!-- Fonts and Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+
+    <!-- Tailwind Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'orangered',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-white shadow-sm sticky top-0 z-50 w-full">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-3">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="{{ url_for('home') }}" class="text-2xl font-['Pacifico'] text-primary">Bếp Thông Minh</a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex items-center space-x-8">
+                <a href="{{ url_for('home') }}" class="text-gray-800 hover:text-primary font-medium">Trang chủ</a>
+                
+
+                <a href="{{ url_for('tu_lanh_page') }}" class="text-primary font-bold">Tủ lạnh của tôi</a>
+                 <a href="{{ url_for('add_recipe') }}" class="text-gray-800 hover:text-primary font-medium">Thêm món ăn</a>
+            </nav>
+
+            <!-- User Status & Actions -->
+            <div class="flex items-center space-x-4">
+                {% if current_user.is_authenticated %}
+                    <span class="text-gray-700">Chào, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="text-sm text-gray-500 hover:text-primary">Đăng xuất</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="text-gray-800 hover:text-primary font-medium">Đăng nhập</a>
+                    <a href="{{ url_for('register') }}" class="bg-primary text-white px-4 py-2 rounded-md text-sm font-medium">Đăng ký</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ================= END HEADER ================= -->
+
+
+<!-- Thẻ MAIN để bao bọc nội dung chính -->
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- Hiển thị các thông báo (Flash Messages) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-4 rounded-md p-4 text-sm {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-blue-100 text-blue-800' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="bg-white p-8 rounded-xl shadow-lg">
+        <div class="flex items-center justify-center mb-6">
+             <h2 class="text-3xl font-bold text-gray-800">🧊 Tủ lạnh của tôi</h2>
+        </div>
+
+        <!-- Phần thêm nguyên liệu -->
+        <div class="mb-8">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Thêm nguyên liệu</h3>
+            <!-- Form thêm thủ công, gửi dữ liệu đến backend -->
+            <form method="POST" action="{{ url_for('tu_lanh_page') }}" class="flex gap-2">
+                <input type="text" name="ingredient_name" placeholder="Ví dụ: Thịt bò, cà chua..." required class="flex-grow w-full pl-4 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none">
+                <button type="submit" class="bg-primary text-white px-6 py-2 rounded-md font-medium hover:bg-opacity-90 transition whitespace-nowrap">Thêm</button>
+            </form>
+            <div class="mt-6 border-t pt-6">
+    <h4 class="text-md font-semibold text-gray-600 mb-2">Hoặc quét từ hóa đơn để thêm nhanh</h4>
+    <form method="POST" action="{{ url_for('scan_bill_api') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-2 items-center">
+        <input type="file" name="bill_image" accept="image/*" required class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+        <button type="submit" class="w-full sm:w-auto bg-blue-600 text-white px-6 py-2 rounded-md font-medium hover:bg-blue-700 transition whitespace-nowrap">
+            <i class="ri-camera-line mr-1"></i> Quét & Thêm
+        </button>
+    </form>
+</div>
+        </div>
+        
+        <hr class="my-8">
+
+        <!-- Phần danh sách nguyên liệu -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                 <h3 class="text-lg font-semibold text-gray-700">Nguyên liệu đang có ({{ ingredients|length }})</h3>
+                 <button onclick="timCongThuc()" class="bg-green-600 text-white px-6 py-2 rounded-md font-medium hover:bg-green-700 transition">
+                    <i class="ri-search-eye-line mr-1"></i> Tìm món phù hợp
+                 </button>
+            </div>
+            
+            <ul id="ingredientList" class="space-y-2">
+                <!-- Vòng lặp để hiển thị các nguyên liệu từ database -->
+                {% for ingredient in ingredients %}
+                    <li class="flex items-center justify-between bg-gray-50 p-3 rounded-md animate-fade-in">
+                        <span class="text-gray-800">{{ ingredient.name }}</span>
+                        <!-- Form để xóa từng nguyên liệu -->
+                        <form method="POST" action="{{ url_for('delete_ingredient', ingredient_id=ingredient.id) }}" onsubmit="return confirm('Bạn có chắc muốn xóa nguyên liệu này?')">
+                            <button type="submit" class="text-gray-400 hover:text-red-500 transition">
+                                <i class="ri-delete-bin-line text-xl"></i>
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="text-center text-gray-500 italic py-4">Tủ lạnh của bạn đang trống!</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</main>
+
+<!-- Không cần JavaScript để quản lý danh sách nữa -->
+<script>
+    // Chỉ còn lại hàm tìm công thức
+    // Thay thế hoàn toàn hàm timCongThuc() cũ
+function timCongThuc() {
+    // Không cần gửi nguyên liệu nữa, backend sẽ tự lấy
+    // Chỉ cần chuyển hướng đến trang gợi ý
+    window.location.href = "{{ url_for('suggest_recipes') }}";
+}
+</script>
+
+</body>
+</html>

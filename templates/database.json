@@ -1,0 +1,27 @@
+[
+  {
+    "TenMon": "Canh chua cá lóc",
+    "NguyenLieu": "Cá lóc, cà chua, me, dứa, giá, rau ngổ, rau thơm",
+    "CachNau": "Rửa sạch cá lóc, cắt khúc, ướp gia vị. Phi hành thơm, cho cà chua vào xào, đổ nước, nêm me. Khi sôi cho cá vào, sau đó thêm giá, dứa, rau ngổ, nêm nếm lại."
+  },
+  {
+    "TenMon": "Trứng chiên",
+    "NguyenLieu": "Trứng gà, hành lá, muối, tiêu, nước mắm",
+    "CachNau": "Đánh trứng với gia vị và hành lá. Bắc chảo lên bếp, cho dầu và đổ trứng vào chiên vàng 2 mặt."
+  },
+  {
+    "TenMon": "Thịt kho tàu",
+    "NguyenLieu": "Thịt ba rọi, trứng gà hoặc trứng vịt, nước dừa, nước mắm, đường, hành tím",
+    "CachNau": "Ướp thịt với nước mắm, đường, hành tím. Luộc trứng và bóc vỏ. Phi hành cho thơm, cho thịt vào đảo, thêm nước dừa, kho đến khi thịt mềm. Cho trứng vào kho cùng."
+  },
+  {
+    "TenMon": "Cơm chiên trứng",
+    "NguyenLieu": "Cơm nguội, trứng, hành lá, nước tương, dầu ăn",
+    "CachNau": "Đánh trứng, xào sơ. Thêm cơm nguội vào đảo đều. Nêm nước tương, tiêu, hành lá rồi xào đến khi hạt cơm tơi và thơm."
+  },
+  {
+    "TenMon": "Rau muống xào tỏi",
+    "NguyenLieu": "Rau muống, tỏi, muối, dầu ăn",
+    "CachNau": "Rửa sạch rau, chẻ vừa ăn. Đun sôi nước, trụng rau. Phi tỏi, cho rau vào xào lửa lớn, nêm muối vừa ăn."
+  }
+]

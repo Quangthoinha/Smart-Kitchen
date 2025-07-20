@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head><script src="https://static.readdy.ai/static/e.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bếp Thông Minh - Đề xuất món ăn từ nguyên liệu có sẵn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="tim-cong-thuc">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+        tailwind.config = {
+                    theme: {
+extend: {
+colors: {
+primary: '#FF6B35',
+secondary: '#4ECDC4'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+}
+
+@keyframes fade-in {
+from {
+opacity: 0;
+transform: translateY(-1rem);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.animate-fade-in {
+animation: fade-in 0.3s ease-out forwards;
+}
+.custom-shadow {
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.hero-section {
+background-image: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), url('https://readdy.ai/api/search-image?query=A%20modern%20kitchen%20scene%20with%20fresh%20ingredients%20scattered%20on%20a%20wooden%20countertop.%20Vibrant%20vegetables%2C%20herbs%2C%20and%20cooking%20utensils%20artfully%20arranged.%20Soft%20natural%20light%20streaming%20through%20a%20window%2C%20creating%20a%20warm%20and%20inviting%20atmosphere.%20The%20scene%20suggests%20home%20cooking%20and%20culinary%20creativity.&width=1600&height=800&seq=hero123&orientation=landscape');
+background-size: cover;
+background-position: center;
+}
+.ingredient-card:hover {
+transform: translateY(-5px);
+transition: transform 0.3s ease;
+}
+.custom-checkbox {
+appearance: none;
+-webkit-appearance: none;
+width: 20px;
+height: 20px;
+border: 2px solid #e5e7eb;
+border-radius: 4px;
+outline: none;
+cursor: pointer;
+position: relative;
+}
+.custom-checkbox:checked {
+background-color: #FF6B35;
+border-color: #FF6B35;
+}
+.custom-checkbox:checked::after {
+content: '';
+position: absolute;
+left: 6px;
+top: 2px;
+width: 5px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-range {
+-webkit-appearance: none;
+appearance: none;
+width: 100%;
+height: 6px;
+background: #e5e7eb;
+border-radius: 5px;
+outline: none;
+}
+.custom-range::-webkit-slider-thumb {
+-webkit-appearance: none;
+appearance: none;
+width: 20px;
+height: 20px;
+background: #FF6B35;
+border-radius: 50%;
+cursor: pointer;
+}
+.custom-range::-moz-range-thumb {
+width: 20px;
+height: 20px;
+background: #FF6B35;
+border-radius: 50%;
+cursor: pointer;
+border: none;
+}
+.switch {
+position: relative;
+display: inline-block;
+width: 48px;
+height: 24px;
+}
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #e5e7eb;
+transition: .4s;
+border-radius: 24px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 18px;
+width: 18px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #FF6B35;
+}
+input:checked + .slider:before {
+transform: translateX(24px);
+}
+</style>
+</head>
+<body class="bg-gray-50">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center">
+<a href="#" class="text-2xl font-['Pacifico'] text-primary">Bếp Thông Minh</a>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a href="/" class="text-gray-800 hover:text-primary font-medium">Trang chủ</a>
+<a href="tu-lanh-cua-toi" class="text-gray-800 hover:text-primary font-medium">Tủ lạnh của tôi</a>
+<a href="bo-suu-tap" class="text-gray-800 hover:text-primary font-medium">Bộ sưu tập</a>
+{% if current_user.is_authenticated %}
+    <a href="{{ url_for('add_recipe') }}">Thêm món ăn</a>
+{% endif %}
+</nav>
+<div class="flex items-center space-x-4">
+<div class="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer">
+<i class="ri-search-line text-gray-600"></i>
+</div>
+<div class="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 cursor-pointer">
+<i class="ri-notification-3-line text-gray-600"></i>
+</div>
+<div class="relative">
+    <div class="btn1">
+        <button class="bg-primary px-4 py-2 rounded-r text-white font-medium hover:bg-opacity-90 transition whitespace-nowrap">
+             <a href="login" class="text-gray-800 hover:text-primary font-medium">Đăng Nhập</a>
+        </button>
+    </div>
+
+<style> 
+.btn1{
+    display: flex;
+    gap: 40px;
+    margin-right: 10px; 
+    background-color: #ff6b3c;   /* màu cam */
+    color: white;                /* chữ màu trắng */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    font-weight: 500;
+    text-align: center;
+    display: block;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    }
+
+.btn1 :hover {
+    background-color: #ff824f;
+}   
+.btn2{
+    display: flex;
+    gap: 10px;
+    margin-left: 10px;
+    background-color: #ff6b3c;   /* màu cam */
+    color: white;                /* chữ màu trắng */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    font-weight: 500;
+    text-align: center;
+    display: block;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    }
+.btn2 :hover {
+    background-color: #ff824f;
+}       
+</style>
+</div>
+</div>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="hero-section w-full py-20">
+<div class="container mx-auto px-4">
+<div class="w-full max-w-2xl">
+<h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Nấu gì hôm nay với nguyên liệu có sẵn?</h1>
+<p class="text-lg text-gray-700 mb-8">Khám phá hàng nghìn công thức phù hợp với những gì bạn đang có trong tủ lạnh. Không cần đi chợ thêm!</p>
+<div class="bg-white p-4 rounded-lg shadow-lg">
+    <!-- Thêm thẻ form để xử lý khi nhấn Enter -->
+    <form id="search-form" class="flex flex-col md:flex-row gap-4">
+        <div class="flex-grow relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <i class="ri-search-line text-gray-400"></i>
+            </div>
+            <!-- Thêm id cho ô input -->
+            <input type="text" id="search-input" class="w-full pl-10 pr-4 py-3 border-none rounded bg-gray-50 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Nhập nguyên liệu bạn có (cách nhau bởi dấu phẩy)">
+        </div>
+        <!-- Đổi button thành type="submit" -->
+        <button type="submit" class="bg-primary text-white px-6 py-3 rounded-button font-medium hover:bg-opacity-90 transition whitespace-nowrap">
+            Tìm công thức
+        </button>
+    </form>
+</div>
+</div>
+<div class="mt-6 text-sm text-gray-600">
+<p>Gợi ý: thịt heo, cà chua, hành tây, trứng, rau mùi...</p>
+</div>
+<div class="mt-8 text-center">
+    <a href="{{ url_for('suggest_recipes') }}" class="inline-block bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition-transform transform hover:scale-105 shadow-xl">
+        <i class="ri-sparkling-2-line mr-2"></i> Hôm nay ăn gì?
+    </a>
+    <p class="mt-3 text-sm text-gray-500">Nhận gợi ý thông minh từ tủ lạnh của bạn!</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-12">
+<!-- Filter Section -->
+<form method="GET" action="{{ url_for('home') }}" class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Bộ lọc tìm kiếm</h2>
+        <!-- Nút Reset chỉ đơn giản là một link về trang chủ không có tham số -->
+        <a href="{{ url_for('home') }}" class="mt-4 md:mt-0 text-primary hover:text-red-700 font-medium flex items-center text-sm">
+            <i class="ri-refresh-line mr-2"></i>
+            <span>Đặt lại bộ lọc</span>
+        </a>
+    </div>
+    
+    <!-- Hàng 1 của bộ lọc -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
+        <!-- Thời gian nấu -->
+        <div>
+            <label for="cookTimeRange" class="block text-sm font-medium text-gray-700 mb-2">Thời gian nấu</label>
+            <div class="mb-1">
+                <span class="text-sm text-gray-500" id="cookTimeValue">Tối đa {{ selected_filters.max_time }} phút</span>
+            </div>
+            <input type="range" min="5" max="120" value="{{ selected_filters.max_time }}" name="max_time" class="custom-range" id="cookTimeRange">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>5 phút</span>
+                <span>120 phút</span>
+            </div>
+        </div>
+        <!-- Độ khó -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Độ khó</label>
+            <div class="flex flex-wrap gap-2">
+                <!-- Dùng radio buttons và label để tạo các nút có thể chọn -->
+                {% for item in difficulty_enum %}
+                    <input type="radio" name="difficulty" id="diff_{{ item.name }}" value="{{ item.name }}" class="hidden" {% if selected_filters.difficulty == item.name %}checked{% endif %}>
+                    <label for="diff_{{ item.name }}" class="cursor-pointer px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors {% if selected_filters.difficulty == item.name %}bg-primary text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">{{ item.value }}</label>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Loại món -->
+        <div>
+            <label for="course_select" class="block text-sm font-medium text-gray-700 mb-2">Loại món</label>
+            <div class="relative">
+                <select name="course" id="course_select" class="w-full bg-gray-50 border border-gray-200 rounded px-4 py-2.5 appearance-none pr-8 focus:ring-2 focus:ring-primary focus:outline-none">
+                    <option value="">Tất cả các loại</option>
+                    {% for item in course_enum %}
+                        <option value="{{ item.name }}" {% if selected_filters.course == item.name %}selected{% endif %}>{{ item.value }}</option>
+                    {% endfor %}
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <i class="ri-arrow-down-s-line text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+        <!-- Ẩm thực -->
+        <div>
+            <label for="cuisine_select" class="block text-sm font-medium text-gray-700 mb-2">Ẩm thực</label>
+            <div class="relative">
+                <select name="cuisine" id="cuisine_select" class="w-full bg-gray-50 border border-gray-200 rounded px-4 py-2.5 appearance-none pr-8 focus:ring-2 focus:ring-primary focus:outline-none">
+                    <option value="">Tất cả các loại</option>
+                    {% for item in cuisine_enum %}
+                        <option value="{{ item.name }}" {% if selected_filters.cuisine == item.name %}selected{% endif %}>{{ item.value }}</option>
+                    {% endfor %}
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <i class="ri-arrow-down-s-line text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-6 border-t pt-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+            <!-- Chế độ ăn -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Chế độ ăn</label>
+                <div class="grid grid-cols-2 gap-y-3 gap-x-2">
+                    {% for item in diet_enum %}
+                        {% if item.name != 'NONE' %}
+                            <div class="flex items-center">
+                                <input type="checkbox" name="diet" value="{{ item.name }}" class="custom-checkbox mr-2" id="diet_{{ item.name }}" {% if item.name in selected_filters.diets %}checked{% endif %}>
+                                <label for="diet_{{ item.name }}" class="text-sm text-gray-600">{{ item.value }}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Sắp xếp -->
+            <div>
+                <label for="sort_by_select" class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo</label>
+                <div class="relative">
+                    <select name="sort_by" id="sort_by_select" class="w-full bg-gray-50 border border-gray-200 rounded px-4 py-2.5 appearance-none pr-8 focus:ring-2 focus:ring-primary focus:outline-none">
+                        <option value="newest" {% if selected_filters.sort_by == 'newest' %}selected{% endif %}>Mới nhất</option>
+                        <option value="time" {% if selected_filters.sort_by == 'time' %}selected{% endif %}>Thời gian nấu (nhanh nhất)</option>
+                        <option value="relevance" {% if selected_filters.sort_by == 'relevance' %}selected{% endif %}>Độ phù hợp</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <i class="ri-arrow-down-s-line text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút Áp dụng -->
+            <div class="flex items-end">
+                 <button type="submit" class="w-full bg-primary text-white px-6 py-2.5 rounded-button font-semibold hover:bg-opacity-90 transition whitespace-nowrap shadow-sm">
+                    <i class="ri-filter-3-line mr-2"></i>Áp dụng bộ lọc
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cookTimeRange = document.getElementById('cookTimeRange');
+    const cookTimeValue = document.getElementById('cookTimeValue');
+    if (cookTimeRange && cookTimeValue) {
+        cookTimeRange.addEventListener('input', function() {
+            if (this.value == 120) {
+                 cookTimeValue.textContent = 'Mọi thời gian';
+            } else {
+                 cookTimeValue.textContent = `Tối đa ${this.value} phút`;
+            }
+        });
+    }
+});
+</script>
+<!-- Results Section -->
+<div class="mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Khám phá món ăn mới</h2>
+    </div>
+
+    <!-- Grid 4x2 để hiển thị món ăn -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- Sửa vòng lặp để duyệt qua `recipes_pagination.items` -->
+        {% for recipe in recipes_pagination.items %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="block">
+                    <img src="{{ url_for('static', filename='recipe_pics/' + recipe.image_file) }}" alt="{{ recipe.name }}" class="w-full h-56 object-cover">
+                </a>
+                <div class="p-5">
+                    <span class="text-xs text-gray-500">{{ recipe.course.value }} - {{ recipe.cuisine.value }}</span>
+                    <h3 class="text-xl font-bold text-gray-900 mt-1 mb-2 h-14 overflow-hidden">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="hover:text-primary">{{ recipe.name }}</a>
+                    </h3>
+                    <div class="flex items-center text-sm text-gray-600">
+                       <i class="ri-user-smile-line mr-1"></i> Bởi {{ recipe.author.username }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- =================== THANH PHÂN TRANG =================== -->
+    <nav class="mt-10 flex justify-center" aria-label="Pagination">
+        <ul class="flex items-center space-x-2">
+            <!-- Nút Trang Trước -->
+            {% if recipes_pagination.has_prev %}
+                <li>
+                    <a href="{{ url_for('home', page=recipes_pagination.prev_num) }}" class="flex items-center justify-center w-10 h-10 rounded-md border bg-white text-gray-600 hover:bg-gray-50">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                </li>
+            {% else %}
+                 <li>
+                    <span class="flex items-center justify-center w-10 h-10 rounded-md border bg-gray-100 text-gray-400 cursor-not-allowed">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </span>
+                </li>
+            {% endif %}
+
+            <!-- Các nút số trang -->
+            {% for page_num in recipes_pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    {% if recipes_pagination.page == page_num %}
+                        <li>
+                            <span class="flex items-center justify-center w-10 h-10 rounded-md bg-primary text-white font-bold">{{ page_num }}</span>
+                        </li>
+                    {% else %}
+                         <li>
+                            <a href="{{ url_for('home', page=page_num) }}" class="flex items-center justify-center w-10 h-10 rounded-md border bg-white text-gray-600 hover:bg-gray-50">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                     <li><span class="px-2">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Nút Trang Sau -->
+            {% if recipes_pagination.has_next %}
+                 <li>
+                    <a href="{{ url_for('home', page=recipes_pagination.next_num) }}" class="flex items-center justify-center w-10 h-10 rounded-md border bg-white text-gray-600 hover:bg-gray-50">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                </li>
+            {% else %}
+                 <li>
+                    <span class="flex items-center justify-center w-10 h-10 rounded-md border bg-gray-100 text-gray-400 cursor-not-allowed">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    <!-- =================== KẾT THÚC PHÂN TRANG =================== -->
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<!-- Popular Ingredients Section -->
+<div class="mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Nguyên liệu phổ biến</h2>
+        <!-- Tạm thời để link là #, bạn có thể tạo một trang mới để xem tất cả sau -->
+        <a href="{{ url_for('all_popular_ingredients_page') }}" class="text-primary hover:text-primary-dark font-medium flex items-center">
+        <span>Xem tất cả</span>
+        <i class="ri-arrow-right-line ml-1"></i>
+    </a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+    {% for ingredient in popular_ingredients %}
+        <div class="bg-white rounded-lg shadow-sm p-4 ingredient-card transition-all duration-300">
+            <a href="{{ url_for('search_recipes_ingredient', nguyenlieu=ingredient.display_name) }}" class="block">
+                <div class="w-full h-32 mb-3 rounded overflow-hidden">
+                    <!-- SỬ DỤNG DỮ LIỆU TỪ DATABASE -->
+                    <img src="{{ ingredient.image_url or url_for('static', filename='images/default_ingredient.jpg') }}" alt="{{ ingredient.display_name }}" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-base font-semibold text-gray-800 mb-1">{{ ingredient.display_name }}</h3>
+                <p class="text-sm text-gray-500">{{ ingredient.count }} công thức</p>
+            </a>
+        </div>
+    {% else %}
+        <p class="col-span-full text-center text-gray-500">Không có dữ liệu về nguyên liệu phổ biến.</p>
+    {% endfor %}
+</div>
+</div>
+<!-- Statistics Section -->
+
+</main>
+<!-- Footer -->
+<footer class="bg-gray-800 text-white pt-12 pb-6">
+<div class="container mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+<div>
+<a href="#" class="text-2xl font-['Pacifico'] text-white mb-4 block">Bếp Thông Minh</a>
+<p class="text-gray-400 mb-4">Nền tảng đề xuất món ăn thông minh dựa trên nguyên liệu có sẵn trong tủ lạnh của bạn.</p>
+<div class="flex space-x-4">
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-700 hover:bg-primary transition">
+<i class="ri-facebook-fill"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-700 hover:bg-primary transition">
+<i class="ri-instagram-line"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-700 hover:bg-primary transition">
+<i class="ri-youtube-line"></i>
+</a>
+<a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-700 hover:bg-primary transition">
+<i class="ri-tiktok-line"></i>
+</a>
+</div>
+</div>
+<div>
+<h3 class="text-lg font-semibold mb-4">Liên kết nhanh</h3>
+<ul class="space-y-2">
+<li><a href="DuAn" class="text-gray-400 hover:text-white transition">Trang chủ</a></li>
+<li><a href="tu-lanh-cua-toi" class="text-gray-400 hover:text-white transition">Tủ lạnh của tôi</a></li>
+<li><a href="bo-suu-tap" class="text-gray-400 hover:text-white transition">Bộ sưu tập</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Blog nấu ăn</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-semibold mb-4">Hỗ trợ</h3>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white transition">Trung tâm trợ giúp</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Điều khoản sử dụng</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Chính sách bảo mật</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Liên hệ</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Báo lỗi</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white transition">Đóng góp ý kiến</a></li>
+</ul>
+</div>
+<div>
+<h3 class="text-lg font-semibold mb-4">Đăng ký nhận tin</h3>
+<p class="text-gray-400 mb-4">Nhận công thức mới và mẹo nấu ăn hàng tuần.</p>
+<div class="flex mb-4">
+<input type="email" class="flex-grow px-4 py-2 rounded-l bg-gray-700 border-none text-white focus:outline-none" placeholder="Email của bạn">
+<button class="bg-primary px-4 py-2 rounded-r text-white font-medium hover:bg-opacity-90 transition whitespace-nowrap">
+    <a href="login" class="text-gray-800 hover:text-primary font-medium">Đăng Kí</a> 
+</button>
+</div>
+<p class="text-sm text-gray-500">Bằng cách đăng ký, bạn đồng ý với chính sách bảo mật của chúng tôi.</p>
+</div>
+</div>
+<div class="border-t border-gray-700 pt-6">
+<div class="flex flex-col md:flex-row justify-between items-center">
+<p class="text-gray-400 text-sm mb-4 md:mb-0">© 2025 Bếp Thông Minh. Tất cả quyền được bảo lưu.</p>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script id="searchHandler">
+document.addEventListener('DOMContentLoaded', function() {
+const searchInput = document.querySelector('.hero-section input[type="text"]');
+const searchButton = searchInput.nextElementSibling;
+const resultsSection = document.querySelector('.results-section');
+const resultsCount = document.querySelector('.results-section h2');
+
+function showNotification(message) {
+const notification = document.createElement('div');
+notification.className = 'fixed top-4 right-4 bg-white shadow-lg rounded-lg px-6 py-4 z-50 animate-fade-in';
+notification.innerHTML = `
+<div class="flex items-center">
+<i class="ri-information-line text-primary text-xl mr-3"></i>
+<span class="text-gray-800">${message}</span>
+</div>
+`;
+document.body.appendChild(notification);
+setTimeout(() => {
+notification.remove();
+}, 3000);
+}
+
+function handleSearch() {
+const ingredients = searchInput.value.trim();
+if (!ingredients) {
+showNotification('Vui lòng nhập ít nhất một nguyên liệu');
+return;
+}
+
+resultsSection.scrollIntoView({ behavior: 'smooth' });
+resultsCount.textContent = `Kết quả tìm kiếm (${Math.floor(Math.random() * 20) + 5})`;
+}
+
+searchButton.addEventListener('click', handleSearch);
+searchInput.addEventListener('keypress', function(e) {
+if (e.key === 'Enter') {
+handleSearch();
+}
+});
+});
+</script>
+
+<script id="cookingTimeRange">
+document.addEventListener('DOMContentLoaded', function() {
+const cookTimeRange = document.getElementById('cookTimeRange');
+const cookTimeValue = document.getElementById('cookTimeValue');
+if (cookTimeRange && cookTimeValue) {
+cookTimeRange.addEventListener('input', function() {
+cookTimeValue.textContent = `Tối đa ${cookTimeRange.value} phút`;
+});
+}
+});
+</script>
+<script id="statisticsChart">
+document.addEventListener('DOMContentLoaded', function() {
+const chartDom = document.getElementById('statisticsChart');
+if (chartDom) {
+const myChart = echarts.init(chartDom);
+const option = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.8)',
+textStyle: {
+color: '#1f2937'
+}
+},
+legend: {
+data: ['Người dùng mới', 'Công thức mới', 'Lượt tìm kiếm', 'Lượt yêu thích'],
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+left: '3%',
+right: '4%',
+bottom: '3%',
+containLabel: true
+},
+xAxis: {
+type: 'category',
+boundaryGap: false,
+data: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+axisLine: {
+lineStyle: {
+color: '#e5e7eb'
+}
+},
+axisLabel: {
+color: '#1f2937'
+}
+},
+yAxis: {
+type: 'value',
+axisLine: {
+lineStyle: {
+color: '#e5e7eb'
+}
+},
+axisLabel: {
+color: '#1f2937'
+},
+splitLine: {
+lineStyle: {
+color: '#f3f4f6'
+}
+}
+},
+series: [
+{
+name: 'Người dùng mới',
+type: 'line',
+stack: 'Total',
+smooth: true,
+lineStyle: {
+width: 2,
+color: 'rgba(87, 181, 231, 1)'
+},
+areaStyle: {
+opacity: 0.1,
+color: {
+type: 'linear',
+x: 0,
+y: 0,
+x2: 0,
+y2: 1,
+colorStops: [{
+offset: 0, color: 'rgba(87, 181, 231, 0.2)'
+}, {
+offset: 1, color: 'rgba(87, 181, 231, 0.01)'
+}]
+}
+},
+emphasis: {
+focus: 'series'
+},
+symbol: 'none',
+data: [1200, 1320, 1500, 1800, 2100, 1950, 2200, 2350, 2458, 2600, 2750, 2900]
+},
+{
+name: 'Công thức mới',
+type: 'line',
+stack: 'Total',
+smooth: true,
+lineStyle: {
+width: 2,
+color: 'rgba(141, 211, 199, 1)'
+},
+areaStyle: {
+opacity: 0.1,
+color: {
+type: 'linear',
+x: 0,
+y: 0,
+x2: 0,
+y2: 1,
+colorStops: [{
+offset: 0, color: 'rgba(141, 211, 199, 0.2)'
+}, {
+offset: 1, color: 'rgba(141, 211, 199, 0.01)'
+}]
+}
+},
+emphasis: {
+focus: 'series'
+},
+symbol: 'none',
+data: [450, 520, 580, 620, 680, 720, 750, 790, 847, 900, 950, 1000]
+},
+{
+name: 'Lượt tìm kiếm',
+type: 'line',
+stack: 'Total',
+smooth: true,
+lineStyle: {
+width: 2,
+color: 'rgba(251, 191, 114, 1)'
+},
+areaStyle: {
+opacity: 0.1,
+color: {
+type: 'linear',
+x: 0,
+y: 0,
+x2: 0,
+y2: 1,
+colorStops: [{
+offset: 0, color: 'rgba(251, 191, 114, 0.2)'
+}, {
+offset: 1, color: 'rgba(251, 191, 114, 0.01)'
+}]
+}
+},
+emphasis: {
+focus: 'series'
+},
+symbol: 'none',
+data: [8000, 9500, 11000, 12500, 14000, 15200, 16000, 17200, 18392, 19500, 21000, 22500]
+},
+{
+name: 'Lượt yêu thích',
+type: 'line',
+stack: 'Total',
+smooth: true,
+lineStyle: {
+width: 2,
+color: 'rgba(252, 141, 98, 1)'
+},
+areaStyle: {
+opacity: 0.1,
+color: {
+type: 'linear',
+x: 0,
+y: 0,
+x2: 0,
+y2: 1,
+colorStops: [{
+offset: 0, color: 'rgba(252, 141, 98, 0.2)'
+}, {
+offset: 1, color: 'rgba(252, 141, 98, 0.01)'
+}]
+}
+},
+emphasis: {
+focus: 'series'
+},
+symbol: 'none',
+data: [4500, 5200, 6000, 6800, 7500, 8200, 8900, 9400, 9874, 10500, 11200, 12000]
+}
+]
+};
+myChart.setOption(option);
+window.addEventListener('resize', function() {
+myChart.resize();
+});
+}
+});
+</script>
+<script>
+    !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } (p = t.createElement("script")).type = "text/javascript", p.crossOrigin = "anonymous", p.async = !0, p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js", (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = "posthog", u.people = u.people || [], u.toString = function (t) { var e = "posthog"; return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e }, u.people.toString = function () { return u.toString(1) + ".people (stub)" }, o = "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "), n = 0; n < o.length; n++)g(u, o[n]); e._i.push([i, s, a]) }, e.__SV = 1) }(document, window.posthog || []);
+    posthog.init('phc_t9tkQZJiyi2ps9zUYm8TDsL6qXo4YmZx0Ot5rBlAlEd', {
+        api_host: 'https://us.i.posthog.com',
+        autocapture: false,
+        capture_pageview: false,
+        capture_pageleave: false,
+        capture_performance: {
+            web_vitals: false,
+        },
+        rageclick: false,
+    })
+    window.shareKey = 'L4_PF2-qLAbN02UHdlO53g';
+    window.host = 'readdy.ai';
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(event) {
+                // Ngăn form gửi đi theo cách truyền thống
+                event.preventDefault(); 
+                
+                const ingredients = searchInput.value.trim();
+                
+                if (ingredients) {
+                    // Chuyển hướng đến trang tìm kiếm với các nguyên liệu
+                    const joined = encodeURIComponent(ingredients);
+                    window.location.href = `/tim-cong-thuc?nguyenlieu=${joined}`;
+                } else {
+                    alert('Vui lòng nhập ít nhất một nguyên liệu để tìm kiếm.');
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Gợi ý món ăn{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Gợi ý dành cho bạn</h1>
+        
+        <!-- Hiển thị thông điệp dựa trên loại gợi ý -->
+        {% if suggestion_type == 'ai_powered' %}
+            <p class="text-lg text-gray-600 mb-12 inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-lg">
+                <i class="ri-robot-2-line"></i> Dựa trên lịch sử xem của bạn, đây là những gợi ý từ trợ lý AI!
+            </p>
+        {% else %}
+            <p class="text-lg text-gray-600 mb-12">
+                Các món ăn được sắp xếp theo mức độ phù hợp nhất với các nguyên liệu bạn đang có.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Danh sách các món ăn gợi ý -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {% for item in analyzed_recipes %}
+            {% set recipe = item.recipe %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border-2 {{ 'border-green-400' if item.missing_count == 0 else 'border-transparent' }}">
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="block">
+                    <div class="relative">
+                        <img src="{{ url_for('static', filename='recipe_pics/' + recipe.image_file) }}" alt="{{ recipe.name }}" class="w-full h-56 object-cover">
+                        <!-- Hiển thị thông tin về nguyên liệu -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                             {% if item.missing_count == 0 %}
+                                <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">CÓ THỂ NẤU</span>
+                            {% else %}
+                                <span class="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">Cần thêm {{ item.missing_count }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                <div class="p-5">
+                    <span class="text-xs text-gray-500">{{ recipe.course.value }} - {{ recipe.cuisine.value }}</span>
+                    <h3 class="text-xl font-bold text-gray-900 mt-1 mb-2 h-14">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="hover:text-primary">{{ recipe.name }}</a>
+                    </h3>
+                    <div class="flex justify-between items-center text-sm text-gray-600">
+                        <div class="flex items-center">
+                           <i class="ri-time-line mr-1"></i> {{ recipe.cooking_time }} phút
+                        </div>
+                         <div class="flex items-center">
+                           <i class="ri-service-line mr-1"></i> {{ recipe.difficulty.value }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-span-full text-center py-16">
+                <i class="ri-fridge-line text-6xl text-gray-300"></i>
+                <p class="text-gray-500 mt-4">Không có gợi ý nào. Hãy thử thêm nguyên liệu vào tủ lạnh!</p>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-12 text-center">
+        <a href="{{ url_for('tu_lanh_page') }}" class="text-primary hover:underline font-medium">
+            <i class="ri-arrow-left-line align-middle"></i> Quay lại Tủ lạnh
+        </a>
+    </div>
+</div>
+{% endblock %}

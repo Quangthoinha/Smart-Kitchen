@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">📚 {{ title }}</h1>
+        <p class="text-lg text-gray-600">
+            Đây là những món ăn bạn đã lưu lại để tham khảo sau.
+        </p>
+    </div>
+
+    <!-- Danh sách các món ăn đã lưu -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {% for recipe in recipes %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group">
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="block">
+                    <img src="{{ url_for('static', filename='recipe_pics/' + recipe.image_file) }}" alt="{{ recipe.name }}" class="w-full h-56 object-cover">
+                </a>
+                <div class="p-5">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 h-14 overflow-hidden">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="hover:text-primary">{{ recipe.name }}</a>
+                    </h3>
+                    
+                    <!-- Form để xóa món ăn khỏi bộ sưu tập -->
+                    <form action="{{ url_for('unsave_recipe', recipe_id=recipe.id) }}" method="POST">
+                        <button type="submit" class="w-full bg-red-50 text-red-600 py-2 rounded-lg font-medium hover:bg-red-100 transition-colors">
+                            <i class="ri-delete-bin-line mr-2"></i>Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <!-- Thông báo khi bộ sưu tập trống -->
+            <div class="col-span-full text-center py-16 bg-gray-100 rounded-lg">
+                <i class="ri-bookmark-3-line text-6xl text-gray-400"></i>
+                <p class="text-gray-500 mt-4 text-lg">Bộ sưu tập của bạn đang trống.</p>
+                <p class="text-gray-500 mt-1">Hãy khám phá và lưu lại những món ăn bạn yêu thích nhé!</p>
+                <a href="{{ url_for('home') }}" class="mt-4 inline-block bg-primary text-white px-6 py-2 rounded-md font-medium">Khám phá ngay</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

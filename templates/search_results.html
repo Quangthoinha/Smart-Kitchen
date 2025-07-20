@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Bếp Thông Minh</title>
+    <!-- Copy phần head từ file indexTuLanh.html để có giao diện đồng bộ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { primary: 'orangered' } } }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header (Bạn nên tạo một file base.html và kế thừa để không phải copy-paste) -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 w-full">
+        <!-- ... (code header của bạn) ... -->
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Kết quả tìm kiếm</h1>
+        <p class="text-gray-600 mb-8">
+            Tìm thấy <span class="font-bold">{{ recipes|length }}</span> món ăn phù hợp với nguyên liệu: 
+            {% for term in search_terms %}
+                <span class="inline-block bg-primary/10 text-primary px-2 py-1 rounded-full text-sm">{{ term }}</span>
+            {% endfor %}
+        </p>
+
+        <!-- Danh sách các món ăn tìm được -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for recipe in recipes %}
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="block">
+                    <div class="relative">
+                        <img src="{{ url_for('static', filename='recipe_pics/' + recipe.image_file) }}" alt="{{ recipe.name }}" class="w-full h-48 object-cover">
+                        <div class="absolute top-3 right-3">
+                            <span class="bg-white bg-opacity-90 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="ri-time-line mr-1"></i> {{ recipe.cooking_time }} phút
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                <div class="p-4">
+                    <span class="bg-primary bg-opacity-10 text-primary text-xs px-2 py-1 rounded-full">{{ recipe.course.value }}</span>
+                    <h3 class="text-lg font-semibold text-gray-800 my-2">
+                         <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="hover:text-primary">{{ recipe.name }}</a>
+                    </h3>
+                    <div class="flex items-center text-sm text-gray-500 mb-3">
+                        <i class="ri-user-line mr-1"></i>
+                        <span>{{ recipe.author.username }}</span>
+                    </div>
+                     <!-- Dòng này có thể không cần nữa nếu cả thẻ đã là một link -->
+                     <!--
+                     <div class="border-t pt-3">
+                        <div class="flex items-center justify-between">
+                            <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="text-primary hover:text-primary-dark text-sm font-medium whitespace-nowrap">Xem chi tiết</a>
+                        </div>
+                    </div>
+                    -->
+                </div>
+            </div>
+            {% else %}
+                <p class="col-span-full text-center text-gray-500 py-10">Rất tiếc, không tìm thấy món ăn nào phù hợp. Hãy thử với các nguyên liệu khác!</p>
+            {% endfor %}
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="{{ url_for('tu_lanh_page') }}" class="text-primary hover:underline">Quay lại Tủ lạnh</a>
+        </div>
+    </main>
+</body>
+</html>

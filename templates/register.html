@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }} - Bếp Thông Minh</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 0; padding: 0; }
+    .register-container { max-width: 450px; margin: 50px auto; padding: 30px; background-color: white; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+    .register-container h2 { text-align: center; margin-bottom: 24px; color: #ff5e3a; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+    .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+    .form-group .error { color: red; font-size: 0.9em; margin-top: 4px; display: block; }
+    .btn-submit { width: 100%; padding: 12px; background-color: #ff5e3a; border: none; color: white; font-weight: bold; font-size: 16px; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; }
+    .btn-submit:hover { background-color: #e64a24; }
+    .text-center { text-align: center; margin-top: 15px; }
+    .text-center a { color: #ff5e3a; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2>{{ title }}</h2>
+    
+    <!-- Form này sẽ gửi dữ liệu đến route /register trong app.py -->
+    <form method="POST" action="{{ url_for('register') }}">
+        <!-- Dòng này bắt buộc phải có để bảo mật CSRF -->
+        {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        <!-- Render label và input cho 'fullname' từ đối tượng form -->
+        {{ form.fullname.label(class="form-label") }}
+        {{ form.fullname(class="form-control", placeholder="Ví dụ: Nguyễn Văn An") }}
+        <!-- Hiển thị lỗi nếu có -->
+        {% for error in form.fullname.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        {{ form.email.label }}
+        {{ form.email(placeholder="vidu@email.com") }}
+        {% for error in form.email.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        {{ form.username.label }}
+        {{ form.username(placeholder="Tên dùng để đăng nhập") }}
+        {% for error in form.username.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        {{ form.password.label }}
+        {{ form.password(placeholder="Tối thiểu 6 ký tự") }}
+        {% for error in form.password.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        {{ form.confirm_password.label }}
+        {{ form.confirm_password(placeholder="Nhập lại mật khẩu ở trên") }}
+        {% for error in form.confirm_password.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+      </div>
+      
+      <!-- Render nút submit từ đối tượng form -->
+      {{ form.submit(class="btn-submit") }}
+    </form>
+    <div class="text-center">
+      <p>Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+    </div>
+  </div>
+
+</body>
+</html>

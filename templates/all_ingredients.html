@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ title }}</h1>
+        <p class="text-lg text-gray-600">
+            Khám phá các công thức nấu ăn theo từng loại nguyên liệu.
+        </p>
+    </div>
+
+    <!-- Grid để hiển thị tất cả các nguyên liệu -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+    {% for ingredient in ingredients %}
+        <div class="bg-white rounded-lg shadow-sm p-4 ingredient-card transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+            <a href="{{ url_for('search_recipes_ingredient', nguyenlieu=ingredient.display_name) }}" class="block text-center">
+                <div class="w-full h-32 mb-3 rounded-lg overflow-hidden bg-gray-100">
+                    <!-- SỬ DỤNG DỮ LIỆU TỪ DATABASE -->
+                    <img src="{{ ingredient.image_url or url_for('static', filename='images/default_ingredient.jpg') }}" alt="{{ ingredient.display_name }}" class="w-full h-full object-cover">
+                </div>
+                <h3 class="text-base font-semibold text-gray-800 mb-1">{{ ingredient.display_name }}</h3>
+                <p class="text-sm text-gray-500">{{ ingredient.count }} công thức</p>
+            </a>
+        </div>
+    {% else %}
+        <p class="col-span-full text-center text-gray-500 py-10">Không có dữ liệu về nguyên liệu phổ biến để hiển thị.</p>
+    {% endfor %}
+</div>
+    
+    <div class="mt-12 text-center">
+        <a href="{{ url_for('home') }}" class="inline-block bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+            <i class="ri-arrow-left-line mr-2"></i>
+            Quay lại Trang chủ
+        </a>
+    </div>
+</div>
+{% endblock %}
