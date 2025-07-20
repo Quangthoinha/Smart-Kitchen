@@ -2,6 +2,11 @@
 # exit on error
 set -o errexit
 
+# --- PHẦN THÊM MỚI ---
+# Di chuyển đến thư mục gốc của script, nơi chứa các file Python
+cd "$(dirname "$0")"
+# --------------------
+
 # Nâng cấp pip để đảm bảo tương thích
 pip install --upgrade pip
 
@@ -9,7 +14,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Chạy các lệnh khởi tạo database và dữ liệu
-# Sử dụng 'flask' trực tiếp từ môi trường ảo
+# Bây giờ các lệnh này sẽ được chạy từ đúng thư mục
 python -m flask init-db
 python seed.py
 python update_images.py
